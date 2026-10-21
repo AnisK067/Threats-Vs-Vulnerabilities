@@ -1,6 +1,7 @@
 # Threats-Vs-Vulnerabilities
 Lab 1: Threats vs Vulnerabilities
 
+Nur Anis Najwa Binti Kamarudin (52215125486)
 
 | No | Scenario | Category | Explanation |
 | :---: | :--- | :---: | :--- |
