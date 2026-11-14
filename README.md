@@ -46,6 +46,9 @@ Testing was performed manually through the browser's built-in developer tools ra
 - **Steps:**
   1. Navigated directly to `http://localhost:3000/#/score-board`
 - **Evidence:** Application confirmed: *"You successfully solved a challenge: Score Board (Find the carefully hidden 'Score Board' page.)"*
+  
+![Score Board Evidence](screenshots/finding1-scoreboard.png)
+
 - **Impact:** An internal administrative/debug page (listing every known vulnerability in the app) was reachable without authentication or any access control, simply by guessing/knowing the route. In a production system, an equivalent exposed debug/admin route could reveal sensitive internal information to any unauthenticated user.
 
 ### Finding 2 — Improper Error Handling
@@ -54,6 +57,9 @@ Testing was performed manually through the browser's built-in developer tools ra
 - **Steps:**
   1. Triggered the login form in a way that caused an unhandled error
 - **Evidence:** Raw, unhandled error text `[object Object]` was displayed directly on the login page instead of a graceful, user-friendly error message.
+
+![Error Handling Evidence](screenshots/finding2-error-handling.png)
+
 - **Impact:** Displaying raw internal error objects to end users can leak implementation details (stack traces, object structures, internal logic) that help an attacker fingerprint the application and plan further attacks.
 
 ### Finding 3 — SQL Injection (Authentication Bypass)
@@ -67,6 +73,9 @@ Testing was performed manually through the browser's built-in developer tools ra
   2. Entered any arbitrary value (`x`) in the **Password** field
   3. Submitted the login form
 - **Evidence:** Application confirmed: *"You successfully solved a challenge: Login Admin (Log in with the administrator's user account.)"* Logged in successfully as `admin@juice-sh.op` without knowing the real credentials, confirmed via the basket page header showing the admin account.
+
+![SQL Injection Login Bypass Evidence](screenshots/finding3-sqli-login-admin.png)
+
 - **Root Cause:** The backend likely concatenates user input directly into a SQL query such as:
   ```sql
   SELECT * FROM users WHERE email = '<input>' AND password = '<input>'
@@ -85,6 +94,9 @@ Testing was performed manually through the browser's built-in developer tools ra
      ```
   3. Submitted the search
 - **Evidence:** Application confirmed: *"You successfully solved a challenge: DOM XSS (Perform a DOM XSS attack with `<iframe src="javascript:alert('xss')">`.)"* The payload was reflected directly into the page DOM (visible as an empty bordered box under the search results), confirming the unsanitized injection was rendered by the browser.
+
+![DOM XSS Evidence](screenshots/finding4-dom-xss.png)
+
 - **Root Cause:** The search feature takes user input and inserts it directly into the DOM without sanitizing or encoding HTML special characters, allowing injected HTML/JavaScript to be parsed and executed by the browser.
 - **Impact:** An attacker could craft a malicious link containing a JavaScript payload (e.g., for session hijacking, credential phishing, or redirecting users to malicious sites) and trick victims into clicking it, executing arbitrary code in the victim's browser session.
 
@@ -107,6 +119,9 @@ Testing was performed manually through the browser's built-in developer tools ra
      .then(data => console.log(data));
      ```
 - **Evidence:** Application confirmed: *"You successfully solved a challenge: View Basket (View another user's shopping basket.)"* The request returned `{status: 'success', data: {...}}` containing another user's basket contents, despite the authenticated session only legitimately owning basket ID 1.
+
+![IDOR Basket Evidence](screenshots/finding5-idor-basket.png)
+
 - **Root Cause:** The `/rest/basket/:id` endpoint does not verify that the authenticated user actually owns the basket ID being requested — it only checks that *a* valid token was presented, not that the token's owner matches the resource.
 - **Impact:** Any authenticated user (not just admin) can view — and potentially modify — any other user's shopping basket simply by changing a numeric ID in the request, exposing other customers' private order data.
 
