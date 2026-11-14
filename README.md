@@ -47,7 +47,7 @@ Testing was performed manually through the browser's built-in developer tools ra
   1. Navigated directly to `http://localhost:3000/#/score-board`
 - **Evidence:** Application confirmed: *"You successfully solved a challenge: Score Board (Find the carefully hidden 'Score Board' page.)"*
   
-![Score Board Evidence](screenshots/finding1-scoreboard.png)
+![Score Board Evidence](ScreenShots/finding1-scoreboard.png)
 
 - **Impact:** An internal administrative/debug page (listing every known vulnerability in the app) was reachable without authentication or any access control, simply by guessing/knowing the route. In a production system, an equivalent exposed debug/admin route could reveal sensitive internal information to any unauthenticated user.
 
