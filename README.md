@@ -32,7 +32,7 @@ Juice Shop is an intentionally vulnerable modern web application (Node.js/Expres
 |---|---|
 | OS | Windows |
 | Tooling | Google Chrome (DevTools: Console & Network tabs) |
-| Access Method | Browser-based manual testing (no external attacker VM — attacker and victim container run on the same host machine) |
+| Access Method | Browser-based manual testing (no external attacker VM = attacker and victim container run on the same host machine) |
 
 Testing was performed manually through the browser's built-in developer tools rather than dedicated pentest VMs, since Juice Shop's vulnerabilities are primarily client/application-layer and reachable through standard browser interaction, request inspection (Network tab), and JavaScript console execution (Console tab, `fetch()` + `localStorage` token manipulation).
 
@@ -47,7 +47,7 @@ Testing was performed manually through the browser's built-in developer tools ra
   1. Navigated directly to `http://localhost:3000/#/score-board`
 - **Evidence:** Application confirmed: *"You successfully solved a challenge: Score Board (Find the carefully hidden 'Score Board' page.)"*
   
-![Score Board Evidence](C:\Users\DELL\OneDrive\Pictures\Screenshots\finding1-scoreboard.png)
+![Score Board Evidence](Screenshots\finding1-scoreboard.png)
 
 - **Impact:** An internal administrative/debug page (listing every known vulnerability in the app) was reachable without authentication or any access control, simply by guessing/knowing the route. In a production system, an equivalent exposed debug/admin route could reveal sensitive internal information to any unauthenticated user.
 
@@ -58,7 +58,7 @@ Testing was performed manually through the browser's built-in developer tools ra
   1. Triggered the login form in a way that caused an unhandled error
 - **Evidence:** Raw, unhandled error text `[object Object]` was displayed directly on the login page instead of a graceful, user-friendly error message.
 
-![Error Handling Evidence](screenshots/finding2-error-handling.png)
+![Error Handling Evidence](screenhots/finding2-error-handling.png)
 
 - **Impact:** Displaying raw internal error objects to end users can leak implementation details (stack traces, object structures, internal logic) that help an attacker fingerprint the application and plan further attacks.
 
