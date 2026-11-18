@@ -47,7 +47,7 @@ Testing was performed manually through the browser's built-in developer tools ra
   1. Navigated directly to `http://localhost:3000/#/score-board`
 - **Evidence:** Application confirmed: *"You successfully solved a challenge: Score Board (Find the carefully hidden 'Score Board' page.)"*
   
-![Score Board Evidence](Screenshots\finding1-scoreboard.png)
+![Score Board Evidence](finding1-scoreboard.png.png)
 
 - **Impact:** An internal administrative/debug page (listing every known vulnerability in the app) was reachable without authentication or any access control, simply by guessing/knowing the route. In a production system, an equivalent exposed debug/admin route could reveal sensitive internal information to any unauthenticated user.
 
@@ -58,7 +58,7 @@ Testing was performed manually through the browser's built-in developer tools ra
   1. Triggered the login form in a way that caused an unhandled error
 - **Evidence:** Raw, unhandled error text `[object Object]` was displayed directly on the login page instead of a graceful, user-friendly error message.
 
-![Error Handling Evidence](screenhots/finding2-error-handling.png)
+![Error Handling Evidence](finding2-error-handling.png.png)
 
 - **Impact:** Displaying raw internal error objects to end users can leak implementation details (stack traces, object structures, internal logic) that help an attacker fingerprint the application and plan further attacks.
 
@@ -74,7 +74,7 @@ Testing was performed manually through the browser's built-in developer tools ra
   3. Submitted the login form
 - **Evidence:** Application confirmed: *"You successfully solved a challenge: Login Admin (Log in with the administrator's user account.)"* Logged in successfully as `admin@juice-sh.op` without knowing the real credentials, confirmed via the basket page header showing the admin account.
 
-![SQL Injection Login Bypass Evidence](screenshots/finding3-sqli-login-admin.png)
+![SQL Injection Login Bypass Evidence](finding3-sqli-login-admin.png.png)
 
 - **Root Cause:** The backend likely concatenates user input directly into a SQL query such as:
   ```sql
@@ -95,10 +95,10 @@ Testing was performed manually through the browser's built-in developer tools ra
   3. Submitted the search
 - **Evidence:** Application confirmed: *"You successfully solved a challenge: DOM XSS (Perform a DOM XSS attack with `<iframe src="javascript:alert('xss')">`.)"* The payload was reflected directly into the page DOM (visible as an empty bordered box under the search results), confirming the unsanitized injection was rendered by the browser.
 
-![DOM XSS Evidence](screenshots/finding4-dom-xss.png)
+![DOM XSS Evidence](finding4-dom-xss.png.png)
 
 - **Root Cause:** The search feature takes user input and inserts it directly into the DOM without sanitizing or encoding HTML special characters, allowing injected HTML/JavaScript to be parsed and executed by the browser.
-- **Impact:** An attacker could craft a malicious link containing a JavaScript payload (e.g., for session hijacking, credential phishing, or redirecting users to malicious sites) and trick victims into clicking it, executing arbitrary code in the victim's browser session.
+- **Impact:** An attacker could craft a malicious link containing a JavaScript payload (for session hijacking, credential phishing, or redirecting users to malicious sites) and trick victims into clicking it, executing arbitrary code in the victim's browser session.
 
 ### Finding 5 — Broken Access Control (IDOR)
 - **OWASP Category:** Broken Access Control (Insecure Direct Object Reference)
@@ -120,7 +120,7 @@ Testing was performed manually through the browser's built-in developer tools ra
      ```
 - **Evidence:** Application confirmed: *"You successfully solved a challenge: View Basket (View another user's shopping basket.)"* The request returned `{status: 'success', data: {...}}` containing another user's basket contents, despite the authenticated session only legitimately owning basket ID 1.
 
-![IDOR Basket Evidence](screenshots/finding5-idor-basket.png)
+![IDOR Basket Evidence](finding5-idor-basket.png.png)
 
 - **Root Cause:** The `/rest/basket/:id` endpoint does not verify that the authenticated user actually owns the basket ID being requested — it only checks that *a* valid token was presented, not that the token's owner matches the resource.
 - **Impact:** Any authenticated user (not just admin) can view — and potentially modify — any other user's shopping basket simply by changing a numeric ID in the request, exposing other customers' private order data.
@@ -142,8 +142,8 @@ Testing was performed manually through the browser's built-in developer tools ra
 ## 5. Limitations
 
 - Testing was conducted entirely against a **local Docker instance** of Juice Shop (not a live/public deployment), so findings reflect the application's known intentional vulnerabilities in a controlled lab environment only.
-- Only a subset of Juice Shop's full challenge catalog was tested; this report does not represent a complete security audit of the application (e.g., Insecure Deserialization, XXE, Cryptographic Issues, and other categories were not explored in this assessment).
-- No dedicated automated scanning tools (e.g., Burp Suite, sqlmap, nikto) were used in this assessment — all vulnerabilities were identified and exploited manually through browser DevTools (Network and Console tabs). Automated scans may surface additional findings not covered here.
+- Only a subset of Juice Shop's full challenge catalog was tested; this report does not represent a complete security audit of the application (Insecure Deserialization, XXE, Cryptographic Issues, and other categories were not explored in this assessment).
+- No dedicated automated scanning tools (like Burp Suite, sqlmap, nikto) were used in this assessment — all vulnerabilities were identified and exploited manually through browser DevTools (Network and Console tabs). Automated scans may surface additional findings not covered here.
 - Testing was performed with attacker and victim on the same physical host (no network segmentation between "attacker" and "victim" machines), which does not fully replicate a realistic remote-attacker scenario.
 - As this is an intentionally vulnerable training application, findings and payloads here are specific to Juice Shop's known design and should not be assumed to generalize directly to production systems without further context-specific testing.
 
